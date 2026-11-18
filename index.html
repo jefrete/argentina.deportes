@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#070d22">
   <title>Deportes Hoy - Horario Argentina</title>
-  <meta name="description" content="Partidos, resultados y posiciones del día con horario de Argentina: Liga Profesional, copas, Europa y Los Pumas.">
+  <meta name="description" content="Partidos, resultados y posiciones del día con horario de Argentina: Liga Profesional, copas, Europa, selecciones europeas y sudamericanas, y Los Pumas.">
 
   <!-- Fuentes: Barlow Condensed (títulos y números) + Manrope (texto) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,134 +15,375 @@
   <!-- Animate.css: entrada suave de las secciones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-  <!-- Tailwind (CDN) -->
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            display: ['"Barlow Condensed"', 'Impact', 'sans-serif'],
-            sans: ['Manrope', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif']
-          },
-          colors: {
-            ink: '#070d22',
-            panel: '#101a3d',
-            panel2: '#18265a',
-            line: '#26377a',
-            celeste: '#75aadb',
-            gold: '#f6b40e',
-            live: '#ff5d73'
-          }
-        }
-      }
-    };
-  </script>
-
   <!-- Lucide: íconos -->
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js" defer></script>
 
   <style>
-    html { background: #070d22; color-scheme: dark; scroll-behavior: smooth; }
+    /* ===================== Base ===================== */
+    :root {
+      --ink: #070d22;
+      --panel: #101a3d;
+      --panel2: #18265a;
+      --line: #26377a;
+      --celeste: #75aadb;
+      --gold: #f6b40e;
+      --live: #ff5d73;
+      --muted: #94a3b8;
+      --soft: #cbd5e1;
+      --font-display: "Barlow Condensed", Impact, sans-serif;
+      --font-sans: Manrope, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { background: var(--ink); color-scheme: dark; scroll-behavior: smooth; }
     body {
-      background-color: #070d22;
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      color: #eef3ff;
+      background-color: var(--ink);
       background-image: radial-gradient(900px 420px at 50% -140px, rgba(27, 58, 122, .75), transparent);
       background-attachment: fixed;
-      color: #eef3ff;
-      margin: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+    button { font-family: inherit; cursor: pointer; }
+    h2, h3, h4, p, ul { margin: 0; }
+    .hidden { display: none !important; }
+    :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     #filters, #days { scrollbar-width: none; }
     #filters::-webkit-scrollbar, #days::-webkit-scrollbar { display: none; }
-    :focus-visible { outline: 2px solid #f6b40e; outline-offset: 2px; }
+    @keyframes pulse { 50% { opacity: .5; } }
     @media (prefers-reduced-motion: reduce) { .animate__animated { animation: none !important; } }
+
+    /* ===================== Íconos ===================== */
+    .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .icon-xs { width: 14px; height: 14px; }
+    .icon-lg { width: 20px; height: 20px; }
+    .icon-xl { width: 24px; height: 24px; }
+    .c-muted { color: var(--muted); }
+    .c-live { color: var(--live); }
+    .c-gold { color: var(--gold); }
+    .c-green { color: #34d399; }
+
+    /* ===================== Header (sin divs: el header es el contenedor flex) ===================== */
+    .site-header {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-around;
+      gap: 8px 16px;
+      padding: 18px 16px 12px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(to bottom, #16296a, #0d1745);
+    }
+    .site-header::before { /* franja celeste-blanca-celeste */
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(to right, var(--celeste), #fff, var(--celeste));
+    }
+    .site-header::after { /* trama de puntos */
+      content: "";
+      position: absolute; inset: 0;
+      pointer-events: none;
+      opacity: .07;
+      background-image: radial-gradient(#fff 1px, transparent 1px);
+      background-size: 18px 18px;
+    }
+    .site-header > * { position: relative; z-index: 1; }
+    .logo { height: 56px; width: auto; max-width: none; flex-shrink: 0; object-fit: contain; display: block; }
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; }
+    .clock {
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+      font-family: var(--font-display); font-size: 1.125rem; font-weight: 700;
+      letter-spacing: .025em; color: var(--celeste);
+    }
+    .link-pos {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .75rem; font-weight: 600; color: var(--soft); text-decoration: none;
+    }
+    .link-pos:hover { color: #fff; }
+    @media (min-width: 640px) {
+      .logo { height: 80px; }
+      .clock { font-size: 1.25rem; }
+    }
+
+    /* ===================== Menú de competencias ===================== */
+    #filters {
+      position: sticky; top: 0; z-index: 30;
+      display: flex; gap: 8px; overflow-x: auto;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7, 13, 34, .85);
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    }
+    .pill {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+      padding: 6px 14px 6px 10px; border-radius: 9999px;
+      border: 1px solid var(--line); background: var(--panel); color: #f1f5f9;
+      font-size: 13px; font-weight: 600;
+      transition: border-color .15s, transform .15s;
+    }
+    .pill:hover { border-color: var(--celeste); transform: translateY(-1px); }
+    .pill.is-on {
+      background: linear-gradient(135deg, var(--celeste), #a9ccee);
+      color: var(--ink); border-color: transparent;
+      box-shadow: 0 10px 15px -3px rgba(117, 170, 219, .3);
+    }
+    .pill.is-on:hover { transform: none; }
+    .flag {
+      height: 15px; width: 22px; border-radius: 3px; object-fit: cover;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, .2);
+    }
+
+    /* ===================== Layout principal ===================== */
+    main { max-width: 48rem; margin: 0 auto; padding: 20px 16px 64px; }
+
+    #days { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px; }
+    .day {
+      min-width: 4.8rem; flex-shrink: 0; padding: 6px 12px; line-height: 1.25; text-align: center;
+      border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: #f1f5f9;
+      transition: border-color .15s;
+    }
+    .day:hover { border-color: var(--celeste); }
+    .day small { display: block; font-size: 11px; color: var(--muted); }
+    .day strong { font-size: 13px; font-weight: 700; }
+    .day.is-on { background: var(--gold); border-color: var(--gold); color: #1c1500; }
+    .day.is-on small { color: rgba(28, 21, 0, .7); }
+
+    /* ===================== Estadísticas ===================== */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+    .stat {
+      padding: 10px 8px; text-align: center;
+      border-radius: 16px; border: 1px solid var(--line); background: var(--panel);
+    }
+    .stat .icon { display: block; margin: 0 auto; }
+    .stat strong {
+      display: block; margin-top: 4px;
+      font-family: var(--font-display); font-size: 1.875rem; font-weight: 800; line-height: 1;
+    }
+    .stat span { font-size: 11px; color: var(--muted); }
+
+    .chips-wrap { display: flex; justify-content: center; margin-bottom: 24px; }
+    #chips { display: inline-flex; padding: 4px; border-radius: 9999px; border: 1px solid var(--line); background: var(--panel); }
+    .chip {
+      padding: 6px 14px; border: 0; border-radius: 9999px; background: transparent;
+      color: var(--soft); font-size: 12px; font-weight: 700; transition: color .15s;
+    }
+    .chip:hover { color: #fff; }
+    .chip.is-on { background: var(--celeste); color: var(--ink); }
+
+    .warning {
+      margin-bottom: 16px; padding: 8px 12px; border-radius: 12px;
+      border: 1px solid rgba(246, 180, 14, .5); background: rgba(246, 180, 14, .1);
+      font-size: 13px; color: #fcd34d;
+    }
+
+    /* ===================== Partidos ===================== */
+    .comp-block { margin-bottom: 36px; }
+    .comp-block--day { margin-bottom: 28px; }
+    .sec-title {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      font-family: var(--font-display); font-size: 1.25rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    .sec-count { font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--muted); }
+    @media (min-width: 640px) { .sec-title { font-size: 1.5rem; } }
+
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 9999px; background: rgba(255, 93, 115, .15);
+      font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: .05em; color: var(--live);
+    }
+    .live-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--live); animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite; }
+
+    .note {
+      margin-top: 8px; padding: 8px 12px; border-radius: 12px;
+      border: 1px dashed var(--line); background: rgba(16, 26, 61, .5);
+      font-size: 14px; color: var(--muted);
+    }
+    .list { margin-top: 10px; display: grid; gap: 8px; }
+
+    .match {
+      padding: 10px 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel);
+      transition: border-color .15s;
+    }
+    .match:hover { border-color: var(--celeste); }
+    .match.is-live {
+      border-color: rgba(255, 93, 115, .7);
+      background: linear-gradient(to right, rgba(255, 93, 115, .15), var(--panel));
+      box-shadow: 0 10px 15px -3px rgba(255, 93, 115, .1);
+    }
+    .match-meta { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; min-width: 0; }
+    .match-time { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; color: #fff; }
+    .match-time.is-live { color: var(--live); }
+    .match-date { font-size: 12px; font-weight: 700; color: var(--gold); }
+    .match-venue { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: var(--muted); }
+    .match-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
+
+    .team { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; }
+    .team-away { justify-content: flex-end; text-align: right; }
+    .team-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #e2e8f0; }
+    .team-name.is-win { font-weight: 800; color: #fff; }
+    .team-logo { width: 28px; height: 28px; flex-shrink: 0; object-fit: contain; }
+    @media (min-width: 640px) {
+      .team { font-size: 14px; }
+      .team-logo { width: 32px; height: 32px; }
+    }
+
+    .score { min-width: 4.6rem; text-align: center; }
+    .score-vs { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .025em; color: var(--muted); }
+    .score-num {
+      display: block; font-family: var(--font-display); font-size: 1.7rem; font-weight: 800;
+      line-height: 1; letter-spacing: .025em; font-variant-numeric: tabular-nums; color: #fff;
+    }
+    .score-num.is-live { color: var(--live); }
+    .score-detail { display: block; margin-top: 4px; font-size: 11px; color: var(--muted); }
+    .score-detail.is-live { font-weight: 700; color: var(--live); }
+
+    .results { margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(38, 55, 122, .6); }
+    .results-title {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em; color: var(--soft);
+    }
+    .results-empty { padding-top: 8px; font-size: 14px; color: var(--muted); }
+
+    .empty { padding: 48px 0; text-align: center; color: var(--muted); }
+    .empty strong { display: block; margin-bottom: 4px; color: #f1f5f9; }
+
+    .skeleton { height: 64px; margin-bottom: 8px; border-radius: 16px; background: var(--panel); animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite; }
+    .skeleton-row { height: 20px; margin: 12px; border-radius: 4px; background: var(--panel2); animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite; }
+
+    /* ===================== Posiciones ===================== */
+    .standings-section { margin-top: 16px; scroll-margin-top: 64px; }
+    .standings-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-top: 32px; border-top: 1px solid var(--line); }
+    .standings-head h2 { font-family: var(--font-display); font-size: 1.875rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+
+    .stand-card { margin-bottom: 16px; overflow: hidden; border-radius: 16px; border: 1px solid var(--line); background: rgba(16, 26, 61, .6); }
+    .stand-sum { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; list-style: none; }
+    .stand-sum::-webkit-details-marker { display: none; }
+    .stand-name { font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+    .stand-chev { margin-left: auto; display: inline-flex; color: var(--muted); transition: transform .2s; }
+    .stand-card[open] .stand-chev { transform: rotate(180deg); }
+    .stand-body { border-top: 1px solid rgba(38, 55, 122, .6); }
+    .stand-msg { padding: 16px; font-size: 14px; color: var(--muted); }
+    .group-name { padding: 6px 16px; background: rgba(24, 38, 90, .5); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--soft); }
+    .table-wrap { overflow-x: auto; }
+    .stand-table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+    .stand-table thead tr { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+    .stand-table th { padding: 8px 6px; text-align: center; font-weight: 600; }
+    .stand-table th.th-pos { width: 32px; padding: 8px 6px; }
+    .stand-table th.th-team { padding: 8px; text-align: left; }
+    .stand-table tbody tr { border-top: 1px solid rgba(38, 55, 122, .6); }
+    .stand-table tbody tr:hover { background: rgba(24, 38, 90, .6); }
+    .stand-table td { padding: 8px 6px; text-align: center; white-space: nowrap; color: var(--soft); }
+    .stand-table td.td-pos { padding: 8px; font-size: 12px; font-weight: 700; }
+    .stand-table td.td-team { width: 100%; max-width: 0; padding: 8px; text-align: left; white-space: normal; }
+    .stand-table td.strong { font-weight: 800; color: #fff; }
+    .team-cell { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .team-cell img { width: 20px; height: 20px; flex-shrink: 0; object-fit: contain; }
+    .team-cell span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #f1f5f9; }
+    .col-wide { display: none; }
+    @media (min-width: 640px) {
+      .col-wide { display: table-cell; }
+      .stand-table th, .stand-table td { padding-left: 8px; padding-right: 8px; }
+    }
+    .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 8px 12px; list-style: none; border-top: 1px solid rgba(38, 55, 122, .6); font-size: 11px; color: var(--muted); }
+    .legend li { display: flex; align-items: center; gap: 6px; }
+    .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+    /* ===================== Footer ===================== */
+    footer { margin-top: 40px; text-align: center; font-size: 12px; color: var(--muted); }
+    #updatedAt { margin-top: 4px; }
+    footer details { margin-top: 12px; text-align: left; }
+    footer summary { cursor: pointer; text-align: center; }
+    #diagList { margin-top: 8px; padding-left: 20px; list-style: disc; }
+    #diagList li { margin-bottom: 2px; }
+    #diagList li.diag-err { color: #fca5a5; }
+    .noscript { padding: 24px; text-align: center; }
   </style>
 </head>
-<body class="min-h-screen bg-ink font-sans text-slate-100 antialiased">
+<body>
 
-  <header class="relative overflow-hidden border-b border-line bg-gradient-to-b from-[#16296a] to-[#0d1745]">
-    <div class="h-1.5 bg-gradient-to-r from-celeste via-white to-celeste"></div>
-    <div class="pointer-events-none absolute inset-0 opacity-[.07]" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 18px 18px;"></div>
-    <div class="relative mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
-      <img src="logo.jpg" alt="Logo" class="h-8 w-auto max-w-none shrink-0 object-contain sm:h-10">
-      <div class="flex flex-col items-end">
-        <div class="flex items-center gap-1.5 whitespace-nowrap font-display text-lg font-bold tracking-wide text-celeste sm:text-xl">
-          <i data-lucide="clock-3" class="h-4 w-4 shrink-0"></i><span id="clock"></span>
-        </div>
-        <a href="#posiciones" class="inline-flex items-center gap-1 text-xs font-semibold text-slate-300 hover:text-white">
-          Ver posiciones <i data-lucide="arrow-down" class="h-3.5 w-3.5"></i>
-        </a>
-      </div>
-    </div>
+  <!-- Header: el propio header es el contenedor flex (space-around), sin divs de por medio -->
+  <header class="site-header">
+    <img src="logo.jpg" alt="Logo" class="logo">
+    <section class="header-right">
+      <span class="clock"><i data-lucide="clock-3" class="icon"></i><span id="clock"></span></span>
+      <a href="#posiciones" class="link-pos">Ver posiciones <i data-lucide="arrow-down" class="icon icon-xs"></i></a>
+    </section>
   </header>
 
-  <nav id="filters" aria-label="Competencias"
-       class="sticky top-0 z-30 flex gap-2 overflow-x-auto border-b border-line bg-ink/85 px-4 py-2.5 backdrop-blur"></nav>
+  <nav id="filters" aria-label="Competencias"></nav>
 
-  <main class="mx-auto max-w-3xl px-4 pb-16 pt-5">
+  <main>
 
-    <div id="days" role="tablist" aria-label="Día" class="mb-4 flex gap-2 overflow-x-auto pb-1"></div>
+    <div id="days" role="tablist" aria-label="Día"></div>
 
-    <div class="mb-4 grid grid-cols-4 gap-2">
-      <div class="rounded-2xl border border-line bg-panel px-2 py-2.5 text-center">
-        <i data-lucide="layers" class="mx-auto h-4 w-4 text-slate-400"></i>
-        <strong id="statTotal" class="mt-1 block font-display text-3xl font-extrabold leading-none">0</strong>
-        <span class="text-[11px] text-slate-400">Total</span>
+    <div class="stats">
+      <div class="stat">
+        <i data-lucide="layers" class="icon c-muted"></i>
+        <strong id="statTotal">0</strong>
+        <span>Total</span>
       </div>
-      <div class="rounded-2xl border border-line bg-panel px-2 py-2.5 text-center">
-        <i data-lucide="radio" class="mx-auto h-4 w-4 text-live"></i>
-        <strong id="statLive" class="mt-1 block font-display text-3xl font-extrabold leading-none text-live">0</strong>
-        <span class="text-[11px] text-slate-400">En vivo</span>
+      <div class="stat">
+        <i data-lucide="radio" class="icon c-live"></i>
+        <strong id="statLive" class="c-live">0</strong>
+        <span>En vivo</span>
       </div>
-      <div class="rounded-2xl border border-line bg-panel px-2 py-2.5 text-center">
-        <i data-lucide="clock" class="mx-auto h-4 w-4 text-gold"></i>
-        <strong id="statUpcoming" class="mt-1 block font-display text-3xl font-extrabold leading-none">0</strong>
-        <span class="text-[11px] text-slate-400">Próximos</span>
+      <div class="stat">
+        <i data-lucide="clock" class="icon c-gold"></i>
+        <strong id="statUpcoming">0</strong>
+        <span>Próximos</span>
       </div>
-      <div class="rounded-2xl border border-line bg-panel px-2 py-2.5 text-center">
-        <i data-lucide="check-check" class="mx-auto h-4 w-4 text-emerald-400"></i>
-        <strong id="statFinished" class="mt-1 block font-display text-3xl font-extrabold leading-none text-slate-300">0</strong>
-        <span class="text-[11px] text-slate-400">Finalizados</span>
-      </div>
-    </div>
-
-    <div class="mb-6 flex justify-center">
-      <div id="chips" role="group" aria-label="Estado" class="inline-flex rounded-full border border-line bg-panel p-1">
-        <button type="button" data-status="all">Todos</button>
-        <button type="button" data-status="live">En vivo</button>
-        <button type="button" data-status="upcoming">Próximos</button>
-        <button type="button" data-status="finished">Finalizados</button>
+      <div class="stat">
+        <i data-lucide="check-check" class="icon c-green"></i>
+        <strong id="statFinished" style="color:#cbd5e1">0</strong>
+        <span>Finalizados</span>
       </div>
     </div>
 
-    <div id="warning" class="mb-4 hidden rounded-xl border border-gold/50 bg-gold/10 px-3 py-2 text-[13px] text-amber-300"></div>
+    <div class="chips-wrap">
+      <div id="chips" role="group" aria-label="Estado">
+        <button type="button" class="chip" data-status="all">Todos</button>
+        <button type="button" class="chip" data-status="live">En vivo</button>
+        <button type="button" class="chip" data-status="upcoming">Próximos</button>
+        <button type="button" class="chip" data-status="finished">Finalizados</button>
+      </div>
+    </div>
+
+    <div id="warning" class="warning hidden"></div>
 
     <div id="content" aria-live="polite"></div>
 
-    <section id="posiciones" class="mt-4 scroll-mt-16">
-      <div class="mb-4 flex items-center gap-2.5 border-t border-line pt-8">
-        <i data-lucide="trophy" class="h-6 w-6 text-gold"></i>
-        <h2 class="font-display text-3xl font-extrabold uppercase tracking-wider">Posiciones</h2>
+    <section id="posiciones" class="standings-section">
+      <div class="standings-head">
+        <i data-lucide="trophy" class="icon icon-xl c-gold"></i>
+        <h2>Posiciones</h2>
       </div>
       <div id="standings"></div>
     </section>
 
-    <footer class="mt-10 text-center text-[12px] text-slate-400">
+    <footer>
       <p>Datos de ESPN · Se actualiza solo (30 s en vivo, 60 s el resto) · Horarios de Argentina (UTC-3)</p>
-      <p id="updatedAt" class="mt-1"></p>
-      <details class="mt-3 text-left">
-        <summary class="cursor-pointer text-center">Detalle de fuentes</summary>
-        <ul id="diagList" class="mt-2 list-disc space-y-0.5 pl-5"></ul>
+      <p id="updatedAt"></p>
+      <details>
+        <summary>Detalle de fuentes</summary>
+        <ul id="diagList"></ul>
       </details>
     </footer>
   </main>
 
-  <noscript><p class="p-6 text-center">Esta página necesita JavaScript.</p></noscript>
+  <noscript><p class="noscript">Esta página necesita JavaScript.</p></noscript>
 
   <script>
 /* Deportes Hoy - Horario Argentina
  * Datos: API pública de ESPN (se consulta directo desde el navegador).
  * Fechas siempre en hora de Argentina (America/Argentina/Buenos_Aires).
- * Estilos: Tailwind (CDN). Íconos: Lucide. Banderas: flagcdn.
+ * Estilos: CSS propio (sin frameworks). Íconos: Lucide. Banderas: flagcdn.
  */
 (function () {
   "use strict";
@@ -150,6 +391,21 @@
   var TZ = "America/Argentina/Buenos_Aires";
   var ESPN = "https://site.api.espn.com/apis/site/v2/sports/";
   var ESPN_V2 = "https://site.api.espn.com/apis/v2/sports/"; // posiciones
+
+  // ---------------------------------------------------------------------------
+  // Filtros de selecciones. Los amistosos (soccer/fifa.friendly) traen a todo el
+  // mundo, así que cada pestaña se queda solo con los equipos de su confederación.
+  // ---------------------------------------------------------------------------
+  var SUDAMERICA_RE = /\b(argentina|brazil|brasil|uruguay|chile|colombia|ecuador|peru|per[uú]|paraguay|bolivia|venezuela)\b/i;
+  var EUROPA_RE = new RegExp("\\b(" + [
+    "england", "scotland", "wales", "northern ireland", "ireland", "france", "germany", "spain", "portugal",
+    "italy", "netherlands", "belgium", "croatia", "switzerland", "austria", "denmark", "sweden", "norway",
+    "finland", "iceland", "poland", "czechia", "czech republic", "slovakia", "slovenia", "serbia", "bosnia",
+    "montenegro", "north macedonia", "albania", "kosovo", "greece", "turkey", "t[uü]rkiye", "bulgaria",
+    "romania", "hungary", "ukraine", "georgia", "armenia", "azerbaijan", "israel", "kazakhstan", "cyprus",
+    "malta", "luxembourg", "estonia", "latvia", "lithuania", "moldova", "belarus", "russia", "faroe",
+    "andorra", "san marino", "gibraltar", "liechtenstein"
+  ].join("|") + ")\\b", "i");
 
   // ---------------------------------------------------------------------------
   // Competencias, en el orden en que aparecen en la página y en el menú.
@@ -171,6 +427,19 @@
       sources: ["soccer/esp.1"], standings: "soccer/esp.1" },
     { id: "seriea", flag: "it", tab: "Serie A", label: "Serie A", color: "#4ade80",
       sources: ["soccer/ita.1"], standings: "soccer/ita.1" },
+
+    // Selecciones sudamericanas: eliminatorias, Copa América y amistosos (solo equipos CONMEBOL).
+    { id: "selec-sudamerica", flag: "globe", tab: "Selec. Sudamérica", label: "Selecciones sudamericanas", color: "#38bdf8", lookahead: 60,
+      teamFilter: SUDAMERICA_RE,
+      sources: ["soccer/fifa.worldq.conmebol", "soccer/conmebol.america", "soccer/fifa.friendly"],
+      standings: null, noTable: "Sin tabla de posiciones vigente por ahora: se muestra cuando haya eliminatorias en curso." },
+
+    // Selecciones europeas: Nations League, Eurocopa, eliminatorias UEFA y amistosos (solo equipos UEFA).
+    { id: "selec-europa", flag: "eu", tab: "Selec. Europa", label: "Selecciones europeas", color: "#a78bfa", lookahead: 60,
+      teamFilter: EUROPA_RE,
+      sources: ["soccer/uefa.nations", "soccer/uefa.euro", "soccer/fifa.worldq.uefa", "soccer/fifa.friendly"],
+      standings: "soccer/uefa.nations" },
+
     { id: "pumas", flag: "ar", rugby: true, noResults: true, lookahead: 60, tab: "Pumas", label: "Los Pumas", color: "#22d3ee",
       teamFilter: /argentina|pumas/i,
       // Rugby en ESPN: 17567 = Nations Championship 2026, 289234 = test matches, 244293 = Rugby Championship.
@@ -561,7 +830,7 @@
   }
   var $ = function (id) { return document.getElementById(id); };
 
-  function icon(name, cls) { return h("i", { "data-lucide": name, class: cls || "h-4 w-4" }); }
+  function icon(name, cls) { return h("i", { "data-lucide": name, class: cls || "icon" }); }
   function refreshIcons() { try { if (window.lucide && window.lucide.createIcons) window.lucide.createIcons(); } catch (e) { /* sin íconos */ } }
   function replay(el) { // reproduce la animación de entrada (Animate.css)
     if (!el) return;
@@ -573,33 +842,24 @@
   function flagImg(comp, cls) {
     var src = flagUrl(comp.flag, comp.color);
     if (!src) return null;
-    var img = h("img", { class: cls || "h-[15px] w-[22px] rounded-[3px] object-cover ring-1 ring-white/20", src: src, alt: "", loading: "lazy" });
+    var img = h("img", { class: cls || "flag", src: src, alt: "", loading: "lazy" });
     img.addEventListener("error", function () { img.style.visibility = "hidden"; });
     return img;
   }
-
-  var FILTER_ON = "bg-gradient-to-br from-celeste to-[#a9ccee] text-ink border-transparent shadow-lg shadow-celeste/30";
-  var FILTER_OFF = "bg-panel text-slate-100 border-line hover:border-celeste hover:-translate-y-px";
 
   function renderFilters() {
     var nav = $("filters");
     nav.textContent = "";
     TABS.forEach(function (t) {
       var comp = COMPETITIONS.filter(function (c) { return c.tab === t; })[0];
-      var lead = comp ? flagImg(comp) : icon("layout-grid", "h-4 w-4");
-      var b = h("button", {
-        type: "button",
-        class: "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border py-1.5 pl-2.5 pr-3.5 text-[13px] font-semibold transition " + (t === state.tab ? FILTER_ON : FILTER_OFF)
-      }, lead, h("span", { text: t }));
+      var lead = comp ? flagImg(comp) : icon("layout-grid", "icon");
+      var b = h("button", { type: "button", class: "pill" + (t === state.tab ? " is-on" : "") }, lead, h("span", { text: t }));
       b.addEventListener("click", function () { setTab(t); });
       nav.appendChild(b);
     });
-    var act = nav.querySelector(".from-celeste");
+    var act = nav.querySelector(".is-on");
     if (act && act.scrollIntoView) { try { act.scrollIntoView({ block: "nearest", inline: "center" }); } catch (e) { /* viejo */ } }
   }
-
-  var DAY_ON = "bg-gold border-gold text-[#1c1500]";
-  var DAY_OFF = "bg-panel border-line text-slate-100 hover:border-celeste";
 
   function renderDays() {
     var box = $("days");
@@ -613,10 +873,9 @@
         var lab = dayLabel(key);
         var sub = Number(p[2]) + "/" + Number(p[1]);
         var named = lab === "Hoy" || lab === "Mañana" || lab === "Ayer";
-        var active = key === state.dayKey;
-        var btn = h("button", { type: "button", class: "min-w-[4.8rem] shrink-0 rounded-xl border px-3 py-1.5 text-center leading-tight transition " + (active ? DAY_ON : DAY_OFF) },
-          h("small", { class: "block text-[11px] " + (active ? "text-[#1c1500]/70" : "text-slate-400"), text: named ? sub : lab.split(" ")[0] }),
-          h("strong", { class: "text-[13px] font-bold", text: named ? lab : sub })
+        var btn = h("button", { type: "button", class: "day" + (key === state.dayKey ? " is-on" : "") },
+          h("small", { text: named ? sub : lab.split(" ")[0] }),
+          h("strong", { text: named ? lab : sub })
         );
         btn.addEventListener("click", function () { state.dayKey = key; renderDays(); load(true); });
         box.appendChild(btn);
@@ -625,8 +884,7 @@
   }
 
   function liveBadge() {
-    return h("span", { class: "inline-flex items-center gap-1 rounded-full bg-live/15 px-2 py-0.5 font-sans text-[11px] font-bold tracking-wider text-live" },
-      h("span", { class: "h-1.5 w-1.5 animate-pulse rounded-full bg-live" }), "EN VIVO");
+    return h("span", { class: "live-badge" }, h("span", { class: "dot" }), "EN VIVO");
   }
 
   function matchRow(e, showDate) {
@@ -636,54 +894,50 @@
     var aWin = finished && (e.away.winner || as > hs);
 
     function teamEl(t, away, win) {
-      var name = h("span", { class: "truncate " + (win ? "font-extrabold text-white" : "font-semibold text-slate-200"), text: t.name });
+      var name = h("span", { class: "team-name" + (win ? " is-win" : ""), text: t.name });
       var kids = [name];
       if (t.logo) {
-        var img = h("img", { src: t.logo, alt: "", loading: "lazy", class: "h-7 w-7 shrink-0 object-contain sm:h-8 sm:w-8" });
+        var img = h("img", { src: t.logo, alt: "", loading: "lazy", class: "team-logo" });
         img.addEventListener("error", function () {
           if (t.flag && img.src.indexOf(t.flag) === -1) img.src = t.flag;
           else img.style.visibility = "hidden";
         });
         kids = away ? [name, img] : [img, name];
       }
-      return h.apply(null, ["div", { class: "flex min-w-0 items-center gap-2 text-[13px] sm:text-sm " + (away ? "justify-end text-right" : "") }].concat(kids));
+      return h.apply(null, ["div", { class: "team" + (away ? " team-away" : "") }].concat(kids));
     }
 
-    var score = h("div", { class: "min-w-[4.6rem] text-center" });
+    var score = h("div", { class: "score" });
     if (upcoming) {
-      score.appendChild(h("span", { class: "text-xs font-semibold uppercase tracking-wide text-slate-400", text: e.detail || "vs" }));
+      score.appendChild(h("span", { class: "score-vs", text: e.detail || "vs" }));
     } else {
       var hv = e.home.score != null && e.home.score !== "" ? e.home.score : "-";
       var av = e.away.score != null && e.away.score !== "" ? e.away.score : "-";
-      score.appendChild(h("span", { class: "block font-display text-[1.7rem] font-extrabold leading-none tabular-nums tracking-wide " + (live ? "text-live" : "text-white"), text: hv + " - " + av }));
-      if (e.detail) score.appendChild(h("span", { class: "mt-1 block text-[11px] " + (live ? "font-bold text-live" : "text-slate-400"), text: e.detail }));
+      score.appendChild(h("span", { class: "score-num" + (live ? " is-live" : ""), text: hv + " - " + av }));
+      if (e.detail) score.appendChild(h("span", { class: "score-detail" + (live ? " is-live" : ""), text: e.detail }));
     }
 
     // Línea de arriba: hora (y fecha) a la izquierda, estadio a la derecha
-    var meta = h("div", { class: "mb-2 flex items-baseline gap-2" },
-      h("span", { class: "font-display text-xl font-bold leading-none tabular-nums " + (live ? "text-live" : "text-white"), text: e.time }),
-      showDate ? h("span", { class: "text-[12px] font-bold text-gold", text: dayLabel(e.dayKey) }) : null,
-      e.venue ? h("span", { class: "ml-auto min-w-0 truncate text-[11px] text-slate-400", text: e.venue }) : null
+    var meta = h("div", { class: "match-meta" },
+      h("span", { class: "match-time" + (live ? " is-live" : ""), text: e.time }),
+      showDate ? h("span", { class: "match-date", text: dayLabel(e.dayKey) }) : null,
+      e.venue ? h("span", { class: "match-venue", text: e.venue }) : null
     );
 
-    return h("article", {
-      class: "rounded-2xl border px-3 py-2.5 transition hover:border-celeste " +
-        (live ? "border-live/70 bg-gradient-to-r from-live/15 to-panel shadow-lg shadow-live/10" : "border-line bg-panel")
-    }, meta, h("div", { class: "grid grid-cols-[1fr_auto_1fr] items-center gap-2" }, teamEl(e.home, false, hWin), score, teamEl(e.away, true, aWin)));
+    return h("article", { class: "match" + (live ? " is-live" : "") },
+      meta,
+      h("div", { class: "match-grid" }, teamEl(e.home, false, hWin), score, teamEl(e.away, true, aWin)));
   }
 
   function sectionTitle(comp, o) {
     o = o || {};
-    var t = h("h2", { class: "flex flex-wrap items-center gap-2 font-display text-xl font-bold uppercase tracking-wider sm:text-2xl", style: "color:" + comp.color },
-      flagImg(comp), o.title || comp.label);
+    var t = h("h2", { class: "sec-title", style: "color:" + comp.color }, flagImg(comp), o.title || comp.label);
     if (o.live) t.appendChild(liveBadge());
-    if (o.count != null) t.appendChild(h("span", { class: "font-sans text-sm font-semibold text-slate-400", text: String(o.count) }));
+    if (o.count != null) t.appendChild(h("span", { class: "sec-count", text: String(o.count) }));
     return t;
   }
 
-  function note(text) {
-    return h("p", { class: "mt-2 rounded-xl border border-dashed border-line bg-panel/50 px-3 py-2 text-sm text-slate-400", text: text });
-  }
+  function note(text) { return h("p", { class: "note", text: text }); }
 
   // o: { title, showDate, note, count }
   function daySection(comp, events, o) {
@@ -691,7 +945,7 @@
     var sec = h("section", {}, sectionTitle(comp, { title: o.title, count: o.count, live: events.some(function (e) { return e.status === "live"; }) }));
     if (o.note) sec.appendChild(note(o.note));
     if (events.length) {
-      var list = h("div", { class: "mt-2.5 space-y-2" });
+      var list = h("div", { class: "list" });
       events.forEach(function (e) { list.appendChild(matchRow(e, o.showDate)); });
       sec.appendChild(list);
     }
@@ -705,13 +959,12 @@
       .sort(function (a, b) { return b.ts - a.ts; })
       .slice(0, 5);
 
-    var box = h("section", { class: "mt-6 border-t border-line/60 pt-4" },
-      h("h3", { class: "flex items-center gap-2 font-display text-base font-bold uppercase tracking-wider text-slate-300" },
-        icon("history", "h-4 w-4 shrink-0 text-slate-400"), comp.label + " · últimos resultados"));
+    var box = h("section", { class: "results" },
+      h("h3", { class: "results-title" }, icon("history", "icon c-muted"), comp.label + " · últimos resultados"));
     if (!list.length) {
-      box.appendChild(h("p", { class: "pt-2 text-sm text-slate-400", text: "Sin resultados en los últimos 30 días." }));
+      box.appendChild(h("p", { class: "results-empty", text: "Sin resultados en los últimos 30 días." }));
     } else {
-      var wrap = h("div", { class: "mt-2.5 space-y-2" });
+      var wrap = h("div", { class: "list" });
       list.forEach(function (e) { wrap.appendChild(matchRow(e, true)); });
       box.appendChild(wrap);
     }
@@ -725,7 +978,7 @@
     content.textContent = "";
 
     if (!state.loaded) {
-      for (var i = 0; i < 5; i++) content.appendChild(h("div", { class: "mb-2 h-16 animate-pulse rounded-2xl bg-panel" }));
+      for (var i = 0; i < 5; i++) content.appendChild(h("div", { class: "skeleton" }));
       refreshIcons();
       return;
     }
@@ -752,8 +1005,8 @@
 
     if (isRange()) {
       if (!list.length) {
-        content.appendChild(h("div", { class: "py-12 text-center text-slate-400" },
-          h("strong", { class: "mb-1 block text-slate-100", text: "No hay partidos de Los Pumas en este período" }),
+        content.appendChild(h("div", { class: "empty" },
+          h("strong", { text: "No hay partidos de Los Pumas en este período" }),
           state.failed.length ? "No se pudo conectar con ESPN. Revisá tu conexión." : "Probá con otro filtro de estado."));
         refreshIcons();
         return;
@@ -762,7 +1015,7 @@
       list.forEach(function (e) { (byDay[e.dayKey] = byDay[e.dayKey] || []).push(e); });
       Object.keys(byDay).sort().forEach(function (k) {
         var evs = byDay[k].sort(byTs);
-        var wrap = h("div", { class: "mb-7" });
+        var wrap = h("div", { class: "comp-block comp-block--day" });
         wrap.appendChild(daySection(evs[0].comp, evs, { title: dayLabel(k) + " · " + evs[0].comp.label }));
         content.appendChild(wrap);
       });
@@ -774,7 +1027,7 @@
     var any = false;
     compsForTab().forEach(function (comp) {
       var evs = list.filter(function (e) { return e.comp.id === comp.id; }).sort(byTs);
-      var wrap = h("div", { class: "mb-9" });
+      var wrap = h("div", { class: "comp-block" });
 
       if (state.statusFilter !== "all") {      // filtro por estado: solo lo que coincide
         if (!evs.length) return;
@@ -799,8 +1052,8 @@
     });
 
     if (!any) {
-      content.appendChild(h("div", { class: "py-12 text-center text-slate-400" },
-        h("strong", { class: "mb-1 block text-slate-100", text: "No hay partidos con ese estado" }), "Probá con otro filtro."));
+      content.appendChild(h("div", { class: "empty" },
+        h("strong", { text: "No hay partidos con ese estado" }), "Probá con otro filtro."));
     }
     refreshIcons();
   }
@@ -809,11 +1062,11 @@
     var dl = $("diagList");
     dl.textContent = "";
     state.diag.forEach(function (d) {
-      dl.appendChild(h("li", { class: d.ok ? "" : "text-red-300", text: (d.ok ? "OK · " : "Error · ") + d.name + " (" + d.src + "): " + d.text }));
+      dl.appendChild(h("li", { class: d.ok ? "" : "diag-err", text: (d.ok ? "OK · " : "Error · ") + d.name + " (" + d.src + "): " + d.text }));
     });
     compsForTab().forEach(function (c) {
       var d = state.tableDiag[c.id];
-      if (d) dl.appendChild(h("li", { class: d.ok ? "" : "text-red-300", text: (d.ok ? "OK · " : "Error · ") + c.label + " (posiciones " + c.standings + "): " + d.text }));
+      if (d) dl.appendChild(h("li", { class: d.ok ? "" : "diag-err", text: (d.ok ? "OK · " : "Error · ") + c.label + " (posiciones " + c.standings + "): " + d.text }));
     });
   }
 
@@ -821,38 +1074,38 @@
   // Posiciones (abajo de todo)
   // ---------------------------------------------------------------------------
   function standingsTable(group) {
-    var head = h("tr", { class: "text-[11px] uppercase tracking-wider text-slate-400" },
-      h("th", { class: "w-8 px-1.5 py-2 text-center font-semibold", text: "#" }),
-      h("th", { class: "px-2 py-2 text-left font-semibold", text: "Equipo" }));
+    var head = h("tr", {},
+      h("th", { class: "th-pos", text: "#" }),
+      h("th", { class: "th-team", text: "Equipo" }));
     COLS.forEach(function (c) {
-      head.appendChild(h("th", { class: "px-1.5 py-2 text-center font-semibold sm:px-2 " + (c.wide ? "hidden sm:table-cell" : ""), text: c.k }));
+      head.appendChild(h("th", { class: c.wide ? "col-wide" : "", text: c.k }));
     });
     var tbody = h("tbody");
     var notes = {};
     group.rows.forEach(function (r, i) {
       if (r.note) notes[r.note.text] = r.note.color;
       var color = r.note && r.note.color ? (/^#/.test(r.note.color) ? r.note.color : "#" + r.note.color) : "transparent";
-      var logo = r.logo ? h("img", { src: r.logo, alt: "", loading: "lazy", class: "h-5 w-5 shrink-0 object-contain" }) : null;
+      var logo = r.logo ? h("img", { src: r.logo, alt: "", loading: "lazy" }) : null;
       if (logo) logo.addEventListener("error", function () { logo.style.visibility = "hidden"; });
-      var tr = h("tr", { class: "border-t border-line/60 hover:bg-panel2/60" },
-        h("td", { class: "px-2 py-2 text-center text-xs font-bold text-slate-300", style: "box-shadow: inset 3px 0 0 " + color, text: String(i + 1) }),
-        h("td", { class: "w-full max-w-0 px-2 py-2" }, h("div", { class: "flex min-w-0 items-center gap-2" }, logo, h("span", { class: "truncate font-semibold text-slate-100", text: r.name }))));
+      var tr = h("tr", {},
+        h("td", { class: "td-pos", style: "box-shadow: inset 3px 0 0 " + color, text: String(i + 1) }),
+        h("td", { class: "td-team" }, h("div", { class: "team-cell" }, logo, h("span", { text: r.name }))));
       COLS.forEach(function (c, j) {
-        tr.appendChild(h("td", { class: "whitespace-nowrap px-1.5 py-2 text-center sm:px-2 " + (c.wide ? "hidden sm:table-cell " : "") + (c.strong ? "font-extrabold text-white" : "text-slate-300"), text: r.cells[j] }));
+        tr.appendChild(h("td", { class: (c.wide ? "col-wide " : "") + (c.strong ? "strong" : ""), text: r.cells[j] }));
       });
       tbody.appendChild(tr);
     });
 
-    var table = h("table", { class: "w-full text-sm tabular-nums" }, h("thead", {}, head), tbody);
-    var wrap = h("div", { class: "overflow-x-auto" }, table);
+    var table = h("table", { class: "stand-table" }, h("thead", {}, head), tbody);
+    var wrap = h("div", { class: "table-wrap" }, table);
 
     var legend = Object.keys(notes);
     var out = h("div", {}, wrap);
     if (legend.length) {
-      var lg = h("ul", { class: "flex flex-wrap gap-x-4 gap-y-1 border-t border-line/60 px-3 py-2 text-[11px] text-slate-400" });
+      var lg = h("ul", { class: "legend" });
       legend.forEach(function (txt) {
         var col = notes[txt] ? (/^#/.test(notes[txt]) ? notes[txt] : "#" + notes[txt]) : "#64748b";
-        lg.appendChild(h("li", { class: "flex items-center gap-1.5" }, h("span", { class: "h-2.5 w-2.5 rounded-full", style: "background:" + col }), txt));
+        lg.appendChild(h("li", {}, h("i", { style: "background:" + col }), txt));
       });
       out.appendChild(lg);
     }
@@ -864,28 +1117,28 @@
     box.textContent = "";
     compsForTab().forEach(function (c) {
       var t = state.tables[c.id] || { loading: true };
-      var det = h("details", { class: "group mb-4 overflow-hidden rounded-2xl border border-line bg-panel/60", "data-comp": c.id });
+      var det = h("details", { class: "stand-card", "data-comp": c.id });
       if (!state.closed[c.id]) det.setAttribute("open", "");
       det.addEventListener("toggle", function () { state.closed[c.id] = !det.open; });
 
-      det.appendChild(h("summary", { class: "flex cursor-pointer list-none items-center gap-2.5 px-4 py-3 [&::-webkit-details-marker]:hidden" },
+      det.appendChild(h("summary", { class: "stand-sum" },
         flagImg(c),
-        h("span", { class: "font-display text-lg font-bold uppercase tracking-wider", style: "color:" + c.color, text: c.label }),
-        h("span", { class: "ml-auto text-slate-400 transition-transform group-open:rotate-180" }, icon("chevron-down", "h-5 w-5"))));
+        h("span", { class: "stand-name", style: "color:" + c.color, text: c.label }),
+        h("span", { class: "stand-chev" }, icon("chevron-down", "icon icon-lg"))));
 
-      var body = h("div", { class: "border-t border-line/60" });
+      var body = h("div", { class: "stand-body" });
       if (t.none) {
-        body.appendChild(h("p", { class: "px-4 py-4 text-sm text-slate-400", text: c.noTable || "Sin tabla de posiciones." }));
+        body.appendChild(h("p", { class: "stand-msg", text: c.noTable || "Sin tabla de posiciones." }));
       } else if (t.loading) {
-        for (var i = 0; i < 4; i++) body.appendChild(h("div", { class: "m-3 h-5 animate-pulse rounded bg-panel2" }));
+        for (var i = 0; i < 4; i++) body.appendChild(h("div", { class: "skeleton-row" }));
       } else if (t.error) {
-        body.appendChild(h("p", { class: "px-4 py-4 text-sm text-slate-400", text: "No se pudo cargar la tabla (" + t.error + "). Se reintenta al recargar." }));
+        body.appendChild(h("p", { class: "stand-msg", text: "No se pudo cargar la tabla (" + t.error + "). Se reintenta al recargar." }));
       } else if (!t.groups.length) {
-        body.appendChild(h("p", { class: "px-4 py-4 text-sm text-slate-400", text: "Sin tabla disponible por ahora (puede ser una fase de eliminación directa)." }));
+        body.appendChild(h("p", { class: "stand-msg", text: "Sin tabla disponible por ahora (puede ser una fase de eliminación directa)." }));
       } else {
-        t.groups.forEach(function (g, gi) {
+        t.groups.forEach(function (g) {
           if (g.name && (t.groups.length > 1 || !/^(standings|table)$/i.test(g.name))) {
-            body.appendChild(h("h4", { class: "bg-panel2/50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-slate-300", text: g.name.replace(/^Group /i, "Grupo ") }));
+            body.appendChild(h("h4", { class: "group-name", text: g.name.replace(/^Group /i, "Grupo ") }));
           }
           body.appendChild(standingsTable(g));
         });
@@ -899,12 +1152,9 @@
   // ---------------------------------------------------------------------------
   // Interacción
   // ---------------------------------------------------------------------------
-  var CHIP_ON = "bg-celeste text-ink";
-  var CHIP_OFF = "text-slate-300 hover:text-white";
-
   function paintChips() {
     document.querySelectorAll("[data-status]").forEach(function (c) {
-      c.className = "rounded-full px-3.5 py-1.5 text-xs font-bold transition " + (c.dataset.status === state.statusFilter ? CHIP_ON : CHIP_OFF);
+      c.className = "chip" + (c.dataset.status === state.statusFilter ? " is-on" : "");
     });
   }
 
